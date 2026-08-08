@@ -273,17 +273,29 @@ export function WizardPortal({
     setMounted(true);
   }, []);
 
-  // Lock background body scroll when overlay is open
+  // Lock background body scroll & pause GSAP ScrollSmoother when overlay is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      try {
+        const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
+        if (smoother) smoother.paused(true);
+      } catch {}
       setShowForm(false);
     } else {
       document.body.style.overflow = "";
+      try {
+        const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
+        if (smoother) smoother.paused(false);
+      } catch {}
       setShowForm(false);
     }
     return () => {
       document.body.style.overflow = "";
+      try {
+        const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
+        if (smoother) smoother.paused(false);
+      } catch {}
     };
   }, [isOpen]);
 
@@ -367,6 +379,8 @@ export function WizardPortal({
             animate={{ y: "0%" }}
             exit={{ y: "100%", transition: { duration: 0.35, ease: [0.76, 0, 0.24, 1] } }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
             style={{
               position: "fixed",
               top: 0,
@@ -379,15 +393,12 @@ export function WizardPortal({
               color: "#09090b",
               overflowY: "auto",
               overflowX: "hidden",
-              /* Enforce exact 100dvh height box so flex content scrolls inside */
               height: "100dvh",
               maxHeight: "100dvh",
               boxSizing: "border-box",
-              display: "flex",
-              flexDirection: "column",
+              display: "block",
               WebkitOverflowScrolling: "touch",
               overscrollBehaviorY: "contain",
-              touchAction: "pan-y",
             }}
           >
             {/* Ambient lime glow — decorative, fixed to overlay */}
@@ -443,7 +454,7 @@ export function WizardPortal({
             {/* ══ INNER CONTENT CARD — full width, no max-width on outer shell ══ */}
             <div
               style={{
-                flex: 1,
+                minHeight: "100%",
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",

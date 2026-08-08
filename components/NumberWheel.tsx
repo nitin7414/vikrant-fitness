@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useRef, useCallback, useState, useEffect } from "react";
-import { motion, useAnimation } from "framer-motion";
+import React from "react";
+import { Minus, Plus } from "lucide-react";
 
-const ITEM_H = 44; // height of each row in the drum
-const VISIBLE = 3; // rows shown (centre = selected)
-
-interface NumberWheelProps {
-  value: number;
-  onChange: (v: number) => void;
+interface NumberInputProps {
+  value: number | string;
+  onChange: (v: any) => void;
   min: number;
   max: number;
   unit: string;
@@ -24,104 +21,45 @@ export function NumberWheel({
   unit,
   label,
   theme = "dark",
-}: NumberWheelProps) {
+}: NumberInputProps) {
   const isBlend = theme === "blend";
-  const controls = useAnimation();
+  const numValue = typeof value === "string" ? parseInt(value, 10) || min : value;
 
-  const clamp = useCallback(
-    (v: number) => Math.min(max, Math.max(min, v)),
-    [min, max]
-  );
+  const clamp = (v: number) => Math.min(max, Math.max(min, v));
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const wheelAccumulator = useRef<number>(0);
-  const lastWheelTime = useRef<number>(0);
-
-  // Reset drag animation transform whenever `value` prop changes
-  useEffect(() => {
-    controls.set({ y: 0 });
-  }, [value, controls]);
-
-  // Handle Mouse Wheel / Trackpad scrolling
-  const handleWheel = useCallback(
-    (e: React.WheelEvent<HTMLDivElement>) => {
-      const now = Date.now();
-      if (now - lastWheelTime.current > 150) {
-        wheelAccumulator.current = 0;
-      }
-      lastWheelTime.current = now;
-
-      wheelAccumulator.current += e.deltaY;
-      const threshold = 30;
-
-      if (Math.abs(wheelAccumulator.current) >= threshold) {
-        const dir = wheelAccumulator.current > 0 ? 1 : -1;
-        const nextVal = clamp(value + dir);
-        if (nextVal !== value) {
-          onChange(nextVal);
-        }
-        wheelAccumulator.current = 0;
-      }
-    },
-    [value, clamp, onChange]
-  );
-
-  // Direct +/- stepping
-  const step = useCallback(
-    (dir: 1 | -1) => {
-      const next = clamp(value + dir);
-      if (next !== value) onChange(next);
-    },
-    [value, clamp, onChange]
-  );
-
-  // Keyboard navigation when focused
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowRight") {
-      e.preventDefault();
-      step(1);
-    } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      step(-1);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    if (raw === "") {
+      onChange(min);
+      return;
+    }
+    const val = parseInt(raw, 10);
+    if (!isNaN(val)) {
+      onChange(clamp(val));
     }
   };
 
-  // Windowed visible items (-3 to +3 around current value)
-  const visibleOffset = 3;
-  const itemsToRender: number[] = [];
-  for (let i = -visibleOffset; i <= visibleOffset; i++) {
-    const num = value + i;
-    if (num >= min && num <= max) {
-      itemsToRender.push(num);
-    }
-  }
+  const step = (delta: number) => {
+    const next = clamp(numValue + delta);
+    onChange(next);
+  };
 
   return (
     <div
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
       style={{
         background: isBlend ? "#ffffff" : "#111113",
         border: isBlend ? "2px solid #cbd5e1" : "2px solid #27272a",
         borderRadius: "20px",
-        padding: "16px 20px 20px",
+        padding: "16px 20px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "10px",
-        userSelect: "none",
-        outline: "none",
+        gap: "12px",
         width: "100%",
+        boxSizing: "border-box",
         boxShadow: isBlend ? "0 4px 15px rgba(0,0,0,0.04)" : "none",
+        transition: "border-color 0.2s ease",
       }}
-      onFocus={(e) =>
-        (e.currentTarget.style.borderColor = isBlend
-          ? "#84cc16"
-          : "rgba(190,242,100,0.6)")
-      }
-      onBlur={(e) =>
-        (e.currentTarget.style.borderColor = isBlend ? "#cbd5e1" : "#27272a")
-      }
     >
       {/* Label */}
       <span
@@ -136,214 +74,114 @@ export function NumberWheel({
         {label}
       </span>
 
-      {/* Drum Container with Wheel Listener */}
-      <div
-        ref={containerRef}
-        onWheel={handleWheel}
-        style={{
-          position: "relative",
-          width: "100%",
-          height: `${ITEM_H * VISIBLE}px`,
-          overflow: "hidden",
-          cursor: "ns-resize",
-          touchAction: "none",
-        }}
-      >
-        {/* Selection highlight band */}
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: 0,
-            right: 0,
-            height: `${ITEM_H}px`,
-            transform: "translateY(-50%)",
-            background: isBlend
-              ? "rgba(132, 204, 22, 0.15)"
-              : "rgba(190,242,100,0.08)",
-            borderTop: isBlend
-              ? "1px solid rgba(132, 204, 22, 0.4)"
-              : "1px solid rgba(190,242,100,0.3)",
-            borderBottom: isBlend
-              ? "1px solid rgba(132, 204, 22, 0.4)"
-              : "1px solid rgba(190,242,100,0.3)",
-            borderRadius: "10px",
-            pointerEvents: "none",
-            zIndex: 2,
-          }}
-        />
-
-        {/* Top & Bottom Fade overlays */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: `${ITEM_H * 0.9}px`,
-            background: isBlend
-              ? "linear-gradient(to bottom, #ffffff 0%, transparent 100%)"
-              : "linear-gradient(to bottom, #111113 0%, transparent 100%)",
-            zIndex: 3,
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: `${ITEM_H * 0.9}px`,
-            background: isBlend
-              ? "linear-gradient(to top, #ffffff 0%, transparent 100%)"
-              : "linear-gradient(to top, #111113 0%, transparent 100%)",
-            zIndex: 3,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Draggable drum container */}
-        <motion.div
-          drag="y"
-          animate={controls}
-          dragConstraints={{ top: -ITEM_H * 2, bottom: ITEM_H * 2 }}
-          dragElastic={0.1}
-          onDragEnd={(_, info) => {
-            const delta = info.offset.y;
-            const threshold = 12;
-            if (Math.abs(delta) >= threshold) {
-              // Dragging down (delta > 0) decreases number; dragging up (delta < 0) increases number
-              const count = Math.round(-delta / ITEM_H);
-              const stepVal = count === 0 ? (delta < 0 ? 1 : -1) : count;
-              const nextVal = clamp(value + stepVal);
-              onChange(nextVal);
-            }
-            // Always snap motion back to y = 0
-            controls.start({ y: 0, transition: { duration: 0.15 } });
-          }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1,
-          }}
-        >
-          {itemsToRender.map((num) => {
-            const isSelected = num === value;
-            const dist = Math.abs(num - value);
-            return (
-              <div
-                key={num}
-                onClick={() => onChange(num)}
-                style={{
-                  height: `${ITEM_H}px`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: isSelected ? "24px" : dist === 1 ? "18px" : "14px",
-                  fontWeight: isSelected ? 900 : 600,
-                  color: isSelected
-                    ? isBlend
-                      ? "#3f6212"
-                      : "#bef264"
-                    : dist === 1
-                    ? isBlend
-                      ? "#64748b"
-                      : "#a1a1aa"
-                    : isBlend
-                    ? "#94a3b8"
-                    : "#3f3f46",
-                  transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                {num}{" "}
-                {isSelected ? (
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      marginLeft: "4px",
-                      color: isBlend ? "#65a30d" : "#a1a1aa",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {unit}
-                  </span>
-                ) : (
-                  ""
-                )}
-              </div>
-            );
-          })}
-        </motion.div>
-      </div>
-
-      {/* Stepper buttons underneath wheel */}
+      {/* Main input & unit row */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           gap: "8px",
           width: "100%",
-          justifyContent: "center",
-          marginTop: "4px",
         }}
       >
+        {/* Decrease button */}
         <button
           type="button"
           onClick={() => step(-1)}
-          disabled={value <= min}
+          disabled={numValue <= min}
+          aria-label={`Decrease ${label}`}
           style={{
-            flex: 1,
-            height: "32px",
-            borderRadius: "8px",
+            width: "38px",
+            height: "38px",
+            borderRadius: "12px",
             background: isBlend ? "#f1f5f9" : "#18181b",
-            border: isBlend ? "1px solid #cbd5e1" : "1px solid #27272a",
-            color: value <= min ? "#cbd5e1" : isBlend ? "#0f172a" : "#e4e4e7",
-            fontWeight: 800,
-            fontSize: "14px",
-            cursor: value <= min ? "not-allowed" : "pointer",
+            border: isBlend ? "1.5px solid #cbd5e1" : "1.5px solid #27272a",
+            color: numValue <= min ? "#cbd5e1" : isBlend ? "#0f172a" : "#e4e4e7",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: numValue <= min ? "not-allowed" : "pointer",
+            flexShrink: 0,
+            transition: "all 0.15s ease",
           }}
         >
-          -
+          <Minus size={16} strokeWidth={2.5} />
         </button>
-        <span
+
+        {/* Input box */}
+        <div
           style={{
-            fontSize: "12px",
-            fontWeight: 800,
-            color: isBlend ? "#4d7c0f" : "#bef264",
-            fontFamily: "monospace",
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            maxWidth: "110px",
           }}
         >
-          {value} {unit}
-        </span>
+          <input
+            type="number"
+            min={min}
+            max={max}
+            value={numValue}
+            onChange={handleInputChange}
+            style={{
+              width: "100%",
+              textAlign: "center",
+              fontSize: "26px",
+              fontWeight: 900,
+              color: isBlend ? "#3f6212" : "#bef264",
+              background: "transparent",
+              border: "none",
+              outline: "none",
+              fontFamily: "inherit",
+              padding: "4px 0",
+              MozAppearance: "textfield",
+            }}
+          />
+        </div>
+
+        {/* Increase button */}
         <button
           type="button"
           onClick={() => step(1)}
-          disabled={value >= max}
+          disabled={numValue >= max}
+          aria-label={`Increase ${label}`}
           style={{
-            flex: 1,
-            height: "32px",
-            borderRadius: "8px",
+            width: "38px",
+            height: "38px",
+            borderRadius: "12px",
             background: isBlend ? "#f1f5f9" : "#18181b",
-            border: isBlend ? "1px solid #cbd5e1" : "1px solid #27272a",
-            color: value >= max ? "#cbd5e1" : isBlend ? "#0f172a" : "#e4e4e7",
-            fontWeight: 800,
-            fontSize: "14px",
-            cursor: value >= max ? "not-allowed" : "pointer",
+            border: isBlend ? "1.5px solid #cbd5e1" : "1.5px solid #27272a",
+            color: numValue >= max ? "#cbd5e1" : isBlend ? "#0f172a" : "#e4e4e7",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: numValue >= max ? "not-allowed" : "pointer",
+            flexShrink: 0,
+            transition: "all 0.15s ease",
           }}
         >
-          +
+          <Plus size={16} strokeWidth={2.5} />
         </button>
       </div>
+
+      {/* Unit Badge */}
+      <span
+        style={{
+          fontSize: "11px",
+          fontWeight: 800,
+          color: isBlend ? "#65a30d" : "#a1a1aa",
+          background: isBlend ? "#f7fee7" : "#18181b",
+          border: isBlend ? "1px solid #d9f99d" : "1px solid #27272a",
+          padding: "2px 10px",
+          borderRadius: "999px",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+        }}
+      >
+        {unit}
+      </span>
     </div>
   );
 }
