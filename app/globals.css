@@ -32,8 +32,57 @@ input[type="number"]::-webkit-outer-spin-button {
   appearance: none;
   margin: 0;
 }
+
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
 
+/* Slow motion floating tilt animations for hero stat cards */
+@keyframes tiltSlowLeft {
+  0%, 100% {
+    transform: rotate(-6deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-6px);
+  }
+}
+
+@keyframes tiltSlowRight {
+  0%, 100% {
+    transform: rotate(6deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(2deg) translateY(-6px);
+  }
+}
+
+@keyframes floatSlowCenter {
+  0%, 100% {
+    transform: translateX(-50%) rotate(0deg) translateY(0px);
+  }
+  50% {
+    transform: translateX(-50%) rotate(1.5deg) translateY(-5px);
+  }
+}
+
+.animate-tilt-slow-left {
+  animation: tiltSlowLeft 6s ease-in-out infinite;
+}
+
+.animate-tilt-slow-right {
+  animation: tiltSlowRight 6s ease-in-out infinite;
+}
+
+.animate-float-slow-center {
+  animation: floatSlowCenter 5s ease-in-out infinite;
+}
+
+/* Utility to hide scrollbars while preserving scroll functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -43,31 +43,32 @@ export async function POST(request: Request) {
     } = body;
 
     // Strict field validations
-    if (!name || !email || !phone || !preferredDate || !preferredTime || !fitnessGoal) {
+    if (!name || !email || !fitnessGoal) {
       return NextResponse.json(
         {
           success: false,
-          error: "Missing required fields. Name, email, phone, date, time slot, and fitness goal are mandatory.",
+          error: "Missing required fields. Name, email, and fitness goal are mandatory.",
         },
         { status: 400 }
       );
     }
 
-    const newBooking: ConsultationBooking = {
+    const newBooking: ConsultationBooking & { source?: string } = {
       id: `bk-${Date.now().toString().slice(-6)}`,
       name,
       email,
-      phone,
+      phone: phone || "Not provided",
       age: Number(age) || 25,
       gender: gender || "Not specified",
       fitnessGoal,
       activityLevel: activityLevel || "Moderate",
       medicalConditions: medicalConditions || "None",
-      preferredDate,
-      preferredTime,
+      preferredDate: preferredDate || new Date().toISOString().split("T")[0],
+      preferredTime: preferredTime || "Flexible / 1-on-1 Call",
       notes: notes || "",
       createdAt: new Date().toISOString(),
       status: "confirmed",
+      source: body.source || "consultation",
     };
 
     // Store booking

@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Dumbbell, Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -34,19 +37,28 @@ function TwitterIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-export function Footer() {
+interface FooterProps {
+  forceRender?: boolean;
+}
+
+export function Footer({ forceRender = false }: FooterProps) {
+  const pathname = usePathname();
+
+  if (pathname === "/" && !forceRender) {
+    return null;
+  }
   return (
-    <footer className="border-t border-zinc-800 bg-zinc-950 text-zinc-400">
+    <footer className="border-t border-zinc-800 bg-[#09090b] text-zinc-400">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 md:grid-cols-2">
           {/* Brand Col */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 shadow-md shadow-amber-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#bef264] text-zinc-950 shadow-md shadow-[#bef264]/20">
                 <Dumbbell className="h-5 w-5 stroke-[2.5]" />
               </div>
               <span className="text-lg font-black tracking-tight text-white">
-                VIKRANT <span className="text-amber-400">FITNESS</span>
+                VIKRANT <span className="text-[#bef264]">FITNESS</span>
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-zinc-400">
@@ -67,7 +79,7 @@ export function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={item.label}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-amber-400 hover:text-amber-400 hover:bg-zinc-800 transition"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:border-[#bef264] hover:text-[#bef264] hover:bg-zinc-800 transition"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -81,28 +93,28 @@ export function Footer() {
             <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Quick Links</h3>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                  <ArrowRight className="h-3 w-3 text-amber-500" /> Home Overview
+                <Link href="/" className="hover:text-[#bef264] transition flex items-center gap-1.5">
+                  <ArrowRight className="h-3 w-3 text-[#bef264]" /> Home Overview
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                  <ArrowRight className="h-3 w-3 text-amber-500" /> Training Programs & Services
+                <Link href="/services" className="hover:text-[#bef264] transition flex items-center gap-1.5">
+                  <ArrowRight className="h-3 w-3 text-[#bef264]" /> Training Programs & Services
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                  <ArrowRight className="h-3 w-3 text-amber-500" /> About Coach Vikrant
+                <Link href="/about" className="hover:text-[#bef264] transition flex items-center gap-1.5">
+                  <ArrowRight className="h-3 w-3 text-[#bef264]" /> About Coach Vikrant
                 </Link>
               </li>
               <li>
-                <Link href="/consultation" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                  <ArrowRight className="h-3 w-3 text-amber-500" /> 1-on-1 Consultation Booking
+                <Link href="/consultation" className="hover:text-[#bef264] transition flex items-center gap-1.5">
+                  <ArrowRight className="h-3 w-3 text-[#bef264]" /> 1-on-1 Consultation Booking
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-amber-400 transition flex items-center gap-1.5">
-                  <ArrowRight className="h-3 w-3 text-amber-500" /> Sign In / Client Portal
+                <Link href="/login" className="hover:text-[#bef264] transition flex items-center gap-1.5">
+                  <ArrowRight className="h-3 w-3 text-[#bef264]" /> Sign In / Client Portal
                 </Link>
               </li>
             </ul>
@@ -125,15 +137,15 @@ export function Footer() {
             <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Get In Touch</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
-                <Mail className="h-4 w-4 text-amber-400 mt-0.5" />
+                <Mail className="h-4 w-4 text-[#bef264] mt-0.5" />
                 <span>coach@vikrantfitness.com</span>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="h-4 w-4 text-amber-400 mt-0.5" />
+                <Phone className="h-4 w-4 text-[#bef264] mt-0.5" />
                 <span>+1 (800) 987-6543</span>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 text-amber-400 mt-0.5" />
+                <MapPin className="h-4 w-4 text-[#bef264] mt-0.5" />
                 <span>Global Online Coaching & Virtual Studio</span>
               </li>
             </ul>

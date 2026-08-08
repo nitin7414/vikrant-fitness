@@ -65,6 +65,36 @@ export interface TrainerProfile {
   }[];
 }
 
+export interface Testimonial {
+  id: string;
+  clientName: string;
+  role: string;
+  rating: number;
+  comment: string;
+  avatar: string;
+  verifiedClient: boolean;
+  transformationTag: string;
+}
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+}
+
+export interface PricingTier {
+  id: string;
+  title: string;
+  tagline: string;
+  duration: string;
+  price: number;
+  currency: string;
+  popular?: boolean;
+  features: string[];
+  ctaLabel: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;

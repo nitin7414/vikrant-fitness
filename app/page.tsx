@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Clock,
@@ -22,14 +23,18 @@ import {
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { MOCK_SERVICES, MOCK_TRAINER } from "@/lib/data";
 import { WizardPortal } from "@/components/WizardPortal";
+import { ExploreContent } from "@/components/ExploreContent";
+import { Footer } from "@/components/Footer";
+import { useAssessmentStore } from "@/lib/assessmentStore";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 }
 
-export default function Home() {
+function HomeContent() {
   // Page visibility state: hide bottom sections by default until "Explore the World of Muscle Builders" is clicked
   const [showBottomSections, setShowBottomSections] = useState(false);
 
@@ -41,12 +46,47 @@ export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     age: "26",
     weightKg: "75",
     targetWeightKg: "70",
     fitnessGoal: "Fat Loss & Muscle Shredding",
     workoutDays: "4-5 Days / Week",
   });
+
+  // Support ?reopen=true&step=N from Consultation page "Edit Assessment" button
+  const searchParams = useSearchParams();
+  const storeData = useAssessmentStore((s) => s);
+
+  useEffect(() => {
+    // Rehydrate the Zustand store (skipHydration=true means we must do this manually)
+    useAssessmentStore.persist.rehydrate();
+  }, []);
+
+  useEffect(() => {
+    const reopen = searchParams.get("reopen");
+    const stepParam = searchParams.get("step");
+    if (reopen === "true" && storeData.name) {
+      // Pre-fill form data from the store
+      setFormData({
+        name: storeData.name,
+        email: storeData.email,
+        phone: storeData.phone,
+        age: storeData.age,
+        weightKg: storeData.weightKg,
+        targetWeightKg: storeData.targetWeightKg,
+        fitnessGoal: storeData.fitnessGoal,
+        workoutDays: storeData.workoutDays,
+      });
+      // Open wizard at the saved step (default to step 3 — goals — so they can adjust in reverse order)
+      const targetStep = stepParam ? Math.min(Math.max(parseInt(stepParam, 10), 1), 4) : 3;
+      setCurrentStep(targetStep);
+      setWizardOpen(true);
+      // Clean the URL params without a full navigation
+      window.history.replaceState({}, "", "/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -90,8 +130,7 @@ export default function Home() {
       // Orbiting Stat Badges Radial Spread
       heroTl.to("#stat-badge-1", { x: -30, y: -25, rotate: -12, ease: "none" }, 0);
       heroTl.to("#stat-badge-2", { x: 30, y: -25, rotate: 12, ease: "none" }, 0);
-      heroTl.to("#stat-badge-3", { x: -30, y: 25, rotate: -12, ease: "none" }, 0);
-      heroTl.to("#stat-badge-4", { x: 30, y: 25, rotate: 12, ease: "none" }, 0);
+      heroTl.to("#stat-badge-3", { y: 20, ease: "none" }, 0);
 
       // 2. SECTION CARDS SMOOTH REVEAL ANIMATIONS (When bottom sections are visible)
       if (showBottomSections) {
@@ -126,15 +165,34 @@ export default function Home() {
 
   // Scroll lock is now handled inside WizardPortal itself
 
-  // Handle Explore Muscle Builders click
-  const handleExploreClick = () => {
+  // Handle Explore Muscle Builders click (One-click reveal + smooth scroll)
+  const handleExploreClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     setShowBottomSections(true);
-    setTimeout(() => {
-      const targetSec = document.getElementById("bottom-sections");
-      if (targetSec) {
-        targetSec.scrollIntoView({ behavior: "smooth" });
+
+    const scrollToTarget = () => {
+      if (typeof window !== "undefined") {
+        ScrollTrigger.refresh();
+        const smoother = ScrollSmoother.get();
+        const targetSec = document.getElementById("bottom-sections");
+        if (smoother && targetSec) {
+          smoother.scrollTo(targetSec, true, "top top");
+        } else if (targetSec) {
+          targetSec.scrollIntoView({ behavior: "smooth" });
+        }
       }
-    }, 100);
+    };
+
+    requestAnimationFrame(() => {
+      setTimeout(scrollToTarget, 60);
+    });
+  };
+
+  // Handle Let's Start click (One-click open questionnaire wizard)
+  const handleStartClick = (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    setWizardOpen(true);
+    setCurrentStep(1);
   };
 
   // Calculate Progress Percentage for Top Bar (Starts at 10%, goes to 100%)
@@ -214,7 +272,7 @@ export default function Home() {
             {/* Central Subject Image: dp-image3.jpg */}
             <div id="hero-image" className="relative group transition-transform">
               <img
-                src="/dp-image3.jpg"
+                src="/dp-image.jpg"
                 alt="Coach Vikrant Transformation"
                 className="h-[420px] sm:h-[500px] md:h-[540px] w-auto max-w-[90vw] object-cover object-top rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] border border-zinc-800/80 group-hover:border-[#bef264]/40 transition-all duration-500"
               />
@@ -222,56 +280,59 @@ export default function Home() {
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-[#09090b] via-transparent via-60% to-transparent pointer-events-none" />
             </div>
 
-            {/* STAT CARD 1: TOP-LEFT (Hours 1.5) */}
+            {/* STAT CARD 1: TOP-LEFT (Session Time - Slow Motion Tilt Animation & Responsive Bounds) */}
             <div
               id="stat-badge-1"
-              className="absolute -top-2 left-0 sm:-left-12 z-30 -rotate-6 hover:rotate-0 transition-all duration-300 bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl flex flex-col items-center space-y-1 w-24 sm:w-28 cursor-pointer hover:border-[#bef264]/60"
+              className="absolute top-2 left-2 sm:-top-2 sm:-left-8 md:-top-4 md:-left-14 z-30 animate-tilt-slow-left transition-all duration-300 bg-zinc-900/95 border border-zinc-800/90 backdrop-blur-xl px-3.5 py-2.5 sm:px-5 sm:py-4 rounded-2xl shadow-2xl flex flex-col items-center justify-center space-y-1 sm:space-y-1.5 w-28 sm:w-36 min-w-[100px] sm:min-w-[130px] cursor-pointer hover:border-[#bef264]/60 hover:scale-105"
               data-lag="0.04"
             >
-              <div className="h-9 w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md">
-                <Clock className="h-5 w-5 stroke-[2.5]" />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md shrink-0">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 stroke-[2.5]" />
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">Hours</span>
-              <span className="text-base font-black text-white leading-none">1.5</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-400 text-center leading-tight">Session Time</span>
+              <span className="text-xs sm:text-base font-black text-white leading-none">1.5 Hrs</span>
             </div>
 
-            {/* STAT CARD 2: TOP-RIGHT (Poses 20) */}
+            {/* STAT CARD 2: TOP-RIGHT (Key Poses - Slow Motion Tilt Animation & Responsive Bounds) */}
             <div
               id="stat-badge-2"
-              className="absolute -top-2 right-0 sm:-right-12 z-30 rotate-6 hover:rotate-0 transition-all duration-300 bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl flex flex-col items-center space-y-1 w-24 sm:w-28 cursor-pointer hover:border-[#bef264]/60"
+              className="absolute top-2 right-2 sm:-top-2 sm:-right-8 md:-top-4 md:-right-14 z-30 animate-tilt-slow-right transition-all duration-300 bg-zinc-900/95 border border-zinc-800/90 backdrop-blur-xl px-3.5 py-2.5 sm:px-5 sm:py-4 rounded-2xl shadow-2xl flex flex-col items-center justify-center space-y-1 sm:space-y-1.5 w-28 sm:w-36 min-w-[100px] sm:min-w-[130px] cursor-pointer hover:border-[#bef264]/60 hover:scale-105"
               data-lag="0.06"
             >
-              <div className="h-9 w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md">
-                <Activity className="h-5 w-5 stroke-[2.5]" />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md shrink-0">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 stroke-[2.5]" />
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">Poses</span>
-              <span className="text-base font-black text-white leading-none">20</span>
+              <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-zinc-400 text-center leading-tight">Key Poses</span>
+              <span className="text-xs sm:text-base font-black text-white leading-none">20+</span>
             </div>
 
-            {/* STAT CARD 3: BOTTOM-LEFT (Kcal 550) */}
+            {/* MERGED STAT CARD: BOTTOM (Burned 550 Kcal & Target 5 Sets - Contained & Slow Motion Float) */}
             <div
               id="stat-badge-3"
-              className="absolute bottom-8 left-0 sm:-left-12 z-30 -rotate-6 hover:rotate-0 transition-all duration-300 bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl flex flex-col items-center space-y-1 w-24 sm:w-28 cursor-pointer hover:border-[#bef264]/60"
+              className="absolute -bottom-5 left-1/2 -translate-x-1/2 z-30 animate-float-slow-center transition-all duration-300 bg-zinc-900/95 border border-zinc-800/90 backdrop-blur-xl px-3.5 py-2.5 sm:px-7 sm:py-4 rounded-2xl shadow-2xl flex items-center justify-between sm:justify-center gap-2.5 sm:gap-6 cursor-pointer hover:border-[#bef264]/60 w-[calc(100%-1.5rem)] max-w-[360px] sm:max-w-none"
               data-lag="0.08"
             >
-              <div className="h-9 w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md">
-                <Flame className="h-5 w-5 stroke-[2.5]" />
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md shrink-0">
+                  <Flame className="h-4 w-4 stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider leading-none">Burned</span>
+                  <span className="text-xs sm:text-sm font-black text-white leading-tight mt-0.5 sm:mt-1">550 Kcal</span>
+                </div>
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">Kcal</span>
-              <span className="text-base font-black text-white leading-none">550</span>
-            </div>
 
-            {/* STAT CARD 4: BOTTOM-RIGHT (Sets 5) */}
-            <div
-              id="stat-badge-4"
-              className="absolute bottom-8 right-0 sm:-right-12 z-30 rotate-6 hover:rotate-0 transition-all duration-300 bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-xl px-4 py-3 rounded-2xl shadow-2xl flex flex-col items-center space-y-1 w-24 sm:w-28 cursor-pointer hover:border-[#bef264]/60"
-              data-lag="0.10"
-            >
-              <div className="h-9 w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md">
-                <Dumbbell className="h-5 w-5 stroke-[2.5]" />
+              <div className="h-7 sm:h-8 w-[1px] bg-zinc-800 shrink-0 mx-0.5 sm:mx-0" />
+
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-[#bef264] text-zinc-950 flex items-center justify-center shadow-md shrink-0">
+                  <Dumbbell className="h-4 w-4 stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider leading-none">Target</span>
+                  <span className="text-xs sm:text-sm font-black text-white leading-tight mt-0.5 sm:mt-1">5 Sets</span>
+                </div>
               </div>
-              <span className="text-[11px] font-medium text-zinc-400">Sets</span>
-              <span className="text-base font-black text-white leading-none">5</span>
             </div>
           </div>
 
@@ -284,7 +345,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 3. BOTTOM ACTION BAR: FLEX LAYOUT WITH "LET'S START" & "EXPLORE THE WORLD OF MUSCLE BUILDERS" */}
+        {/* 3. BOTTOM ACTION BAR: FLEX LAYOUT WITH EQUAL HEIGHT SINGLE-LINE BUTTONS */}
         <div className="relative z-20 max-w-7xl mx-auto w-full px-4 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-6 pt-4">
           {/* Bottom Left Social Proof */}
           <div className="flex items-center gap-3 bg-zinc-900/70 border border-zinc-800/80 px-4 py-2.5 rounded-2xl backdrop-blur-md shrink-0">
@@ -306,32 +367,40 @@ export default function Home() {
               />
             </div>
             <div>
-              <p className="text-base font-black text-white leading-none">12k+</p>
-              <p className="text-[11px] font-medium text-zinc-400">Happy Spirits</p>
+              <p className="text-base font-black text-white leading-none">100+</p>
+              <p className="text-[11px] font-medium text-zinc-400">Happy Clients</p>
             </div>
           </div>
 
           {/* 
-            FLEX ACTION BUTTONS (JUSTIFY-AROUND / JUSTIFY-BETWEEN)
-            1. "Let's Start >>>" (Opens God-Like Questionnaire Wizard)
-            2. "Explore the World of Muscle Builders" (Reveals Lower Sections)
+            FLEX ACTION BUTTONS (EQUAL HEIGHT & SINGLE-LINE LABELS)
+            1. "Transform Now >>>" (Opens Transformation Questionnaire Wizard)
+            2. "Explore" (Reveals Lower Sections)
           */}
           <div className="flex flex-wrap items-center justify-around gap-4 w-full md:w-auto">
-            {/* Button 1: Let's Start */}
+            {/* Button 1: Transform Now */}
             <button
-              onClick={() => {
-                setWizardOpen(true);
-                setCurrentStep(1);
-              }}
-              className="flex-1 md:flex-none flex items-center justify-center gap-3 rounded-full bg-[#bef264] px-8 py-3.5 text-xs font-black uppercase tracking-wider text-zinc-950 hover:bg-[#a3e635] transition-all shadow-[0_0_30px_rgba(190,242,100,0.35)] active:scale-95 group"
+              type="button"
+              onClick={handleStartClick}
+              aria-label="Start Transformation Wizard"
+              className="flex-1 md:flex-none h-12 flex items-center justify-center gap-3 rounded-full bg-[#bef264] px-8 text-xs font-black uppercase tracking-wider text-zinc-950 hover:bg-[#a3e635] transition-all shadow-[0_0_30px_rgba(190,242,100,0.35)] active:scale-95 group cursor-pointer whitespace-nowrap"
             >
-              <span>Let's Start</span>
+              <span>Ready to Transform?</span>
               <div className="flex items-center text-zinc-950 font-bold text-sm tracking-tighter group-hover:translate-x-1 transition-transform">
                 &gt;&gt;&gt;
               </div>
             </button>
 
-            {/* Button 2: Explore the World of Muscle Builders */}
+            {/* Button 2: Explore */}
+            <button
+              type="button"
+              onClick={handleExploreClick}
+              aria-label="Explore the World of Muscle Builders"
+              className="flex-1 md:flex-none h-12 flex items-center justify-center gap-2 rounded-full border border-[#bef264]/40 bg-zinc-900/90 px-8 text-xs font-black uppercase tracking-wider text-white hover:bg-[#bef264] hover:text-zinc-950 transition-all shadow-xl hover:shadow-[0_0_30px_rgba(190,242,100,0.25)] active:scale-95 group cursor-pointer whitespace-nowrap"
+            >
+              <Compass className="h-4 w-4 text-[#bef264] group-hover:text-zinc-950 transition-colors" />
+              <span>Explore</span>
+            </button>
           </div>
         </div>
       </section>
@@ -339,184 +408,25 @@ export default function Home() {
 
       {/* 
         ========================================================================
-        DYNAMICALLY REVEALED LOWER PAGE SECTIONS
-        (Only rendered when user clicks "Explore the World of Muscle Builders")
+        DYNAMICALLY REVEALED EXPLORE SECTIONS (IN EXACT ORDER: 1 TO 8)
+        (Rendered when user clicks "Explore")
         ========================================================================
       */}
       {showBottomSections && (
         <div id="bottom-sections" className="animate-fadeIn">
-          {/* FEATURED SERVICES SECTION */}
-          <section className="py-24 bg-[#09090b] border-b border-zinc-800/80 relative">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-              <div className="text-center space-y-3 max-w-3xl mx-auto gsap-reveal" data-speed="clamp(0.95)">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-[#bef264]/30 bg-[#bef264]/10 px-3.5 py-1 text-xs font-bold text-[#bef264]">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  <span>CUSTOMIZED TRANSFORMATIONS</span>
-                </div>
-                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
-                  Tailored <span className="text-[#bef264]">Training Programs</span>
-                </h2>
-                <p className="text-zinc-400 text-sm">
-                  Engineered with science-backed hypertrophy protocols & tailored nutrition strategy.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {MOCK_SERVICES.slice(0, 3).map((service, idx) => (
-                  <div
-                    key={service.id}
-                    data-speed={idx % 2 === 0 ? "clamp(1.03)" : "clamp(0.98)"}
-                    data-lag={(idx * 0.05).toString()}
-                    className="gsap-reveal group relative flex flex-col rounded-3xl border border-zinc-800 bg-zinc-900/60 overflow-hidden hover:border-[#bef264]/60 transition-all duration-300 shadow-xl"
-                  >
-                    <div className="h-52 overflow-hidden relative">
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
-                      />
-                      <div className="absolute top-4 right-4 bg-zinc-950/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-[#bef264] border border-zinc-800">
-                        {service.duration}
-                      </div>
-                      {service.popular && (
-                        <div className="absolute top-4 left-4 bg-[#bef264] text-zinc-950 font-black text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-                          Most Popular
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
-                      <div className="space-y-3">
-                        <h3 className="text-xl font-extrabold text-white group-hover:text-[#bef264] transition">
-                          {service.title}
-                        </h3>
-                        <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{service.subtitle}</p>
-
-                        <div className="pt-2">
-                          <span className="text-3xl font-black text-white">${service.price}</span>
-                          <span className="text-xs text-zinc-400 ml-1">/ {service.duration}</span>
-                        </div>
-
-                        <ul className="space-y-2 pt-2 border-t border-zinc-800/80 text-xs text-zinc-300">
-                          {service.features.slice(0, 3).map((f, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <CheckCircle2 className="h-4 w-4 text-[#bef264] mt-0.5 shrink-0" />
-                              <span>{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <Link
-                        href="/consultation"
-                        className="w-full text-center rounded-2xl bg-zinc-800 hover:bg-[#bef264] hover:text-zinc-950 py-3 text-xs font-black uppercase tracking-wider text-zinc-200 transition shadow-md"
-                      >
-                        Enroll / Book Consultation
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center pt-4 gsap-reveal">
-                <Link
-                  href="/services"
-                  className="inline-flex items-center gap-2 text-sm font-bold text-[#bef264] hover:underline transition"
-                >
-                  View All Coaching Packages <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </section>
-
-          {/* TRANSFORMATION PROOF SHOWCASE */}
-          <section className="py-24 bg-zinc-900/30 border-b border-zinc-800/80">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-              <div className="text-center space-y-3 max-w-3xl mx-auto gsap-reveal" data-speed="clamp(0.95)">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-[#bef264]/30 bg-[#bef264]/10 px-3.5 py-1 text-xs font-bold text-[#bef264]">
-                  <Award className="h-3.5 w-3.5" />
-                  <span>VERIFIED RESULTS</span>
-                </div>
-                <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
-                  Real Client <span className="text-[#bef264]">Transformations</span>
-                </h2>
-                <p className="text-zinc-400 text-sm">See how everyday individuals achieved extraordinary physique changes.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {MOCK_TRAINER.transformations.map((t, idx) => (
-                  <div
-                    key={t.id}
-                    data-speed="clamp(1.02)"
-                    data-lag={(idx * 0.08).toString()}
-                    className="gsap-reveal rounded-3xl border border-zinc-800/90 bg-zinc-900/80 p-6 flex flex-col justify-between space-y-6 shadow-xl hover:border-[#bef264]/40 transition"
-                  >
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden border border-zinc-800">
-                        <div className="relative">
-                          <img src={t.imageBefore} alt="Before" className="h-40 w-full object-cover" />
-                          <span className="absolute bottom-2 left-2 bg-zinc-950/90 text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded">
-                            BEFORE
-                          </span>
-                        </div>
-                        <div className="relative">
-                          <img src={t.imageAfter} alt="After" className="h-40 w-full object-cover" />
-                          <span className="absolute bottom-2 right-2 bg-[#bef264] text-zinc-950 text-[10px] font-extrabold px-2 py-0.5 rounded">
-                            AFTER
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="font-extrabold text-white text-base">{t.clientName}</h3>
-                        <p className="text-xs text-[#bef264] font-semibold">{t.duration} Transformation</p>
-                      </div>
-
-                      <p className="text-xs italic text-zinc-300 leading-relaxed">"{t.quote}"</p>
-                    </div>
-
-                    <div className="pt-4 border-t border-zinc-800 text-xs text-zinc-400 flex items-center justify-between">
-                      <span>Weight Shift:</span>
-                      <span className="font-bold text-[#bef264]">
-                        {t.weightLostKg ? `-${t.weightLostKg} kg fat` : ""} {t.muscleGainedKg ? `+${t.muscleGainedKg} kg muscle` : ""}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* FINAL CONSULTATION CTA BANNER */}
-          <section className="py-24 bg-gradient-to-b from-[#09090b] via-zinc-950 to-[#09090b] text-white relative">
-            <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-8 gsap-reveal" data-speed="clamp(0.95)">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#bef264]/30 bg-[#bef264]/10 px-4 py-1.5 text-xs font-bold text-[#bef264]">
-                <ShieldCheck className="h-4 w-4" />
-                <span>LIMITED WEEKLY CONSULTATION SLOTS</span>
-              </div>
-
-              <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-tight">
-                Ready to Build Your <span className="text-[#bef264]">Best Physique?</span>
-              </h2>
-
-              <p className="text-zinc-400 text-base max-w-2xl mx-auto leading-relaxed">
-                Book a 1-on-1 strategy call directly with Coach Vikrant to audit your body composition, optimize your training structure, and lock in your custom roadmap.
-              </p>
-
-              <div>
-                <Link
-                  href="/consultation"
-                  className="inline-flex items-center gap-3 rounded-full bg-[#bef264] px-10 py-4 text-xs sm:text-sm font-black uppercase tracking-wider text-zinc-950 hover:bg-[#a3e635] transition shadow-[0_0_40px_rgba(190,242,100,0.35)] active:scale-95"
-                >
-                  Book 1-on-1 Strategy Session
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </div>
-            </div>
-          </section>
+          <ExploreContent onOpenWizard={handleStartClick} />
+          <Footer forceRender />
         </div>
       )}
     </div>
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }

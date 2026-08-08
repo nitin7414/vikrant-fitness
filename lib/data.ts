@@ -1,4 +1,4 @@
-import { ServiceProgram, TrainerProfile, ConsultationSlot, ConsultationBooking, UserProfile } from "./types";
+import { ServiceProgram, TrainerProfile, ConsultationSlot, ConsultationBooking, UserProfile, Testimonial, FAQItem, PricingTier } from "./types";
 
 export const MOCK_SERVICES: ServiceProgram[] = [
   {
@@ -184,3 +184,126 @@ export const MOCK_USER: UserProfile = {
   activePlan: "1-on-1 Elite Personal Coaching",
   consultationBookings: MOCK_BOOKINGS
 };
+
+export const MOCK_TESTIMONIALS: Testimonial[] = [
+  {
+    id: "test-1",
+    clientName: "David K.",
+    role: "Senior Software Engineer",
+    rating: 5,
+    comment: "I lost 14 kg in 12 weeks while increasing my bench press. Coach Vikrant's biomechanics audits cured my shoulder impingement. The 1-on-1 accountability is unmatched.",
+    avatar: "/dp-image.jpg",
+    verifiedClient: true,
+    transformationTag: "-14 kg Fat Loss"
+  },
+  {
+    id: "test-2",
+    clientName: "Priya Nair",
+    role: "Product Design Lead",
+    rating: 5,
+    comment: "Finally a coach who understands busy corporate work schedules! My macro plan was customized to my vegetarian diet without sacrificing muscle recovery.",
+    avatar: "/dp-image2.jpg",
+    verifiedClient: true,
+    transformationTag: "+4.5 kg Lean Muscle"
+  },
+  {
+    id: "test-3",
+    clientName: "Ethan Reynolds",
+    role: "Founder & CEO",
+    rating: 5,
+    comment: "Vikrant doesn't just sell workout templates. He audits your daily lifestyle, sleep, and biomechanics. Best investment I've made in my health in 10 years.",
+    avatar: "/dp-image3.jpg",
+    verifiedClient: true,
+    transformationTag: "-22 kg Body Recomp"
+  }
+];
+
+export const MOCK_FAQS: FAQItem[] = [
+  {
+    id: "faq-1",
+    question: "Can I cancel or pause my coaching protocol if I travel?",
+    answer: "Yes, absolutely. You can pause your coaching program for up to 30 days during business travel, vacations, or personal emergencies with zero penalty.",
+    category: "Flexibility"
+  },
+  {
+    id: "faq-2",
+    question: "Is this program suitable for complete fitness beginners?",
+    answer: "100%. Every workout split and biomechanics guide is engineered from your current baseline up. Coach Vikrant personally reviews your exercise execution via video feedback.",
+    category: "Experience Level"
+  },
+  {
+    id: "faq-3",
+    question: "Do I need a commercial gym membership, or can I train at home?",
+    answer: "Both work! Whether you have access to a full power rack or basic adjustable dumbbells at home, your workout splits are customized around your exact equipment.",
+    category: "Equipment"
+  },
+  {
+    id: "faq-4",
+    question: "Are there long-term locked contract commitments or hidden fees?",
+    answer: "No hidden fees ever. All coaching tiers are flat-rate upfront programs with no auto-renewal surprises or mandatory long-term lock-in contracts.",
+    category: "Billing"
+  },
+  {
+    id: "faq-5",
+    question: "Do I have to follow a strict dry diet or stop eating out socially?",
+    answer: "Not at all. We utilize flexible nutrition science based on total daily energy expenditure (TDEE). You will learn how to incorporate dining out and social meals into your targets.",
+    category: "Nutrition"
+  }
+];
+
+export const MOCK_PACKAGES: PricingTier[] = [
+  {
+    id: "pkg-kickstart",
+    title: "Kickstart Protocol",
+    tagline: "Rapid 8-week body recomposition & habit foundation.",
+    duration: "8 Weeks",
+    price: 349,
+    currency: "USD",
+    popular: false,
+    features: [
+      "Customized 8-Week Training Split",
+      "Calculated Macro & Meal Strategy",
+      "Bi-Weekly Progress & Photo Audits",
+      "Form Check & Biomechanics Feedback",
+      "WhatsApp Support (48-hr response)"
+    ],
+    ctaLabel: "Start Kickstart Protocol"
+  },
+  {
+    id: "pkg-elite",
+    title: "Elite 1-on-1 Transformation",
+    tagline: "Our flagship 12-week total physique & lifestyle overhaul.",
+    duration: "12 Weeks",
+    price: 499,
+    currency: "USD",
+    popular: true,
+    features: [
+      "Customized 12-Week Hypertrophy & Fat Loss Program",
+      "Precision Macro & Micronutrient Meal Strategy",
+      "Weekly 1-on-1 Live Video Check-ins with Coach Vikrant",
+      "Daily Priority WhatsApp Direct Access",
+      "Supplement & Sleep Recovery Optimization",
+      "Guaranteed Physique Recomposition"
+    ],
+    ctaLabel: "Enroll in Elite 1-on-1"
+  },
+  {
+    id: "pkg-vip",
+    title: "VIP Masterclass & Mastery",
+    tagline: "Comprehensive 24-week long-term physique & athletic mastery.",
+    duration: "24 Weeks",
+    price: 899,
+    currency: "USD",
+    popular: false,
+    features: [
+      "Full 24-Week Periodized Progressive Overload Split",
+      "Advanced Nutrition & Metabolic Adaptation Management",
+      "Unlimited Form & Lifting Biomechanics Video Analysis",
+      "Direct 24/7 Priority Phone & WhatsApp Line",
+      "Travel & Dining-Out Social Event Protocols",
+      "Lifetime Habit Maintenance Blueprint"
+    ],
+    ctaLabel: "Join VIP Masterclass"
+  }
+];
+
