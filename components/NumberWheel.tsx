@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import React, { useRef, useCallback, useState, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 
 const ITEM_H = 44; // height of each row in the drum
 const VISIBLE = 3; // rows shown (centre = selected)
@@ -26,6 +26,7 @@ export function NumberWheel({
   theme = "dark",
 }: NumberWheelProps) {
   const isBlend = theme === "blend";
+  const controls = useAnimation();
 
   const clamp = useCallback(
     (v: number) => Math.min(max, Math.max(min, v)),
@@ -36,12 +37,14 @@ export function NumberWheel({
   const wheelAccumulator = useRef<number>(0);
   const lastWheelTime = useRef<number>(0);
 
+  // Reset drag animation transform whenever `value` prop changes
+  useEffect(() => {
+    controls.set({ y: 0 });
+  }, [value, controls]);
+
   // Handle Mouse Wheel / Trackpad scrolling
   const handleWheel = useCallback(
     (e: React.WheelEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
       const now = Date.now();
       if (now - lastWheelTime.current > 150) {
         wheelAccumulator.current = 0;
@@ -49,7 +52,7 @@ export function NumberWheel({
       lastWheelTime.current = now;
 
       wheelAccumulator.current += e.deltaY;
-      const threshold = 25;
+      const threshold = 30;
 
       if (Math.abs(wheelAccumulator.current) >= threshold) {
         const dir = wheelAccumulator.current > 0 ? 1 : -1;
@@ -111,11 +114,25 @@ export function NumberWheel({
         width: "100%",
         boxShadow: isBlend ? "0 4px 15px rgba(0,0,0,0.04)" : "none",
       }}
-      onFocus={(e) => (e.currentTarget.style.borderColor = isBlend ? "#84cc16" : "rgba(190,242,100,0.6)")}
-      onBlur={(e) => (e.currentTarget.style.borderColor = isBlend ? "#cbd5e1" : "#27272a")}
+      onFocus={(e) =>
+        (e.currentTarget.style.borderColor = isBlend
+          ? "#84cc16"
+          : "rgba(190,242,100,0.6)")
+      }
+      onBlur={(e) =>
+        (e.currentTarget.style.borderColor = isBlend ? "#cbd5e1" : "#27272a")
+      }
     >
       {/* Label */}
-      <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.12em", color: isBlend ? "#475569" : "#71717a" }}>
+      <span
+        style={{
+          fontSize: "11px",
+          fontWeight: 800,
+          textTransform: "uppercase",
+          letterSpacing: "0.12em",
+          color: isBlend ? "#475569" : "#71717a",
+        }}
+      >
         {label}
       </span>
 
@@ -141,9 +158,15 @@ export function NumberWheel({
             right: 0,
             height: `${ITEM_H}px`,
             transform: "translateY(-50%)",
-            background: isBlend ? "rgba(132, 204, 22, 0.15)" : "rgba(190,242,100,0.08)",
-            borderTop: isBlend ? "1px solid rgba(132, 204, 22, 0.4)" : "1px solid rgba(190,242,100,0.3)",
-            borderBottom: isBlend ? "1px solid rgba(132, 204, 22, 0.4)" : "1px solid rgba(190,242,100,0.3)",
+            background: isBlend
+              ? "rgba(132, 204, 22, 0.15)"
+              : "rgba(190,242,100,0.08)",
+            borderTop: isBlend
+              ? "1px solid rgba(132, 204, 22, 0.4)"
+              : "1px solid rgba(190,242,100,0.3)",
+            borderBottom: isBlend
+              ? "1px solid rgba(132, 204, 22, 0.4)"
+              : "1px solid rgba(190,242,100,0.3)",
             borderRadius: "10px",
             pointerEvents: "none",
             zIndex: 2,
@@ -151,27 +174,60 @@ export function NumberWheel({
         />
 
         {/* Top & Bottom Fade overlays */}
-        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: `${ITEM_H * 0.9}px`, background: isBlend ? "linear-gradient(to bottom, #ffffff 0%, transparent 100%)" : "linear-gradient(to bottom, #111113 0%, transparent 100%)", zIndex: 3, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: `${ITEM_H * 0.9}px`, background: isBlend ? "linear-gradient(to top, #ffffff 0%, transparent 100%)" : "linear-gradient(to top, #111113 0%, transparent 100%)", zIndex: 3, pointerEvents: "none" }} />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: `${ITEM_H * 0.9}px`,
+            background: isBlend
+              ? "linear-gradient(to bottom, #ffffff 0%, transparent 100%)"
+              : "linear-gradient(to bottom, #111113 0%, transparent 100%)",
+            zIndex: 3,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: `${ITEM_H * 0.9}px`,
+            background: isBlend
+              ? "linear-gradient(to top, #ffffff 0%, transparent 100%)"
+              : "linear-gradient(to top, #111113 0%, transparent 100%)",
+            zIndex: 3,
+            pointerEvents: "none",
+          }}
+        />
 
-        {/* Draggable container */}
+        {/* Draggable drum container */}
         <motion.div
           drag="y"
-          dragConstraints={{ top: -ITEM_H * 0.8, bottom: ITEM_H * 0.8 }}
-          dragElastic={0.2}
+          animate={controls}
+          dragConstraints={{ top: -ITEM_H * 2, bottom: ITEM_H * 2 }}
+          dragElastic={0.1}
           onDragEnd={(_, info) => {
-            const threshold = 15;
-            if (info.offset.y < -threshold) {
-              const count = Math.min(5, Math.max(1, Math.round(Math.abs(info.offset.y) / ITEM_H)));
-              onChange(clamp(value + count));
-            } else if (info.offset.y > threshold) {
-              const count = Math.min(5, Math.max(1, Math.round(Math.abs(info.offset.y) / ITEM_H)));
-              onChange(clamp(value - count));
+            const delta = info.offset.y;
+            const threshold = 12;
+            if (Math.abs(delta) >= threshold) {
+              // Dragging down (delta > 0) decreases number; dragging up (delta < 0) increases number
+              const count = Math.round(-delta / ITEM_H);
+              const stepVal = count === 0 ? (delta < 0 ? 1 : -1) : count;
+              const nextVal = clamp(value + stepVal);
+              onChange(nextVal);
             }
+            // Always snap motion back to y = 0
+            controls.start({ y: 0, transition: { duration: 0.15 } });
           }}
           style={{
             position: "absolute",
-            top: 0, left: 0, right: 0, bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -194,16 +250,36 @@ export function NumberWheel({
                   fontSize: isSelected ? "24px" : dist === 1 ? "18px" : "14px",
                   fontWeight: isSelected ? 900 : 600,
                   color: isSelected
-                    ? isBlend ? "#3f6212" : "#bef264"
+                    ? isBlend
+                      ? "#3f6212"
+                      : "#bef264"
                     : dist === 1
-                    ? isBlend ? "#64748b" : "#a1a1aa"
-                    : isBlend ? "#94a3b8" : "#3f3f46",
+                    ? isBlend
+                      ? "#64748b"
+                      : "#a1a1aa"
+                    : isBlend
+                    ? "#94a3b8"
+                    : "#3f3f46",
                   transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
                   cursor: "pointer",
                   width: "100%",
                 }}
               >
-                {num} {isSelected ? <span style={{ fontSize: "12px", marginLeft: "4px", color: isBlend ? "#65a30d" : "#a1a1aa", fontWeight: 700 }}>{unit}</span> : ""}
+                {num}{" "}
+                {isSelected ? (
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      marginLeft: "4px",
+                      color: isBlend ? "#65a30d" : "#a1a1aa",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {unit}
+                  </span>
+                ) : (
+                  ""
+                )}
               </div>
             );
           })}
@@ -211,7 +287,16 @@ export function NumberWheel({
       </div>
 
       {/* Stepper buttons underneath wheel */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", justifyContent: "center", marginTop: "4px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          width: "100%",
+          justifyContent: "center",
+          marginTop: "4px",
+        }}
+      >
         <button
           type="button"
           onClick={() => step(-1)}
@@ -230,7 +315,14 @@ export function NumberWheel({
         >
           -
         </button>
-        <span style={{ fontSize: "12px", fontWeight: 800, color: isBlend ? "#4d7c0f" : "#bef264", fontFamily: "monospace" }}>
+        <span
+          style={{
+            fontSize: "12px",
+            fontWeight: 800,
+            color: isBlend ? "#4d7c0f" : "#bef264",
+            fontFamily: "monospace",
+          }}
+        >
           {value} {unit}
         </span>
         <button

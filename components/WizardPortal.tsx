@@ -277,16 +277,13 @@ export function WizardPortal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
       setShowForm(false);
     } else {
       document.body.style.overflow = "";
-      document.body.style.touchAction = "";
       setShowForm(false);
     }
     return () => {
       document.body.style.overflow = "";
-      document.body.style.touchAction = "";
     };
   }, [isOpen]);
 
@@ -382,13 +379,15 @@ export function WizardPortal({
               color: "#09090b",
               overflowY: "auto",
               overflowX: "hidden",
-              /* Use 100dvh so mobile browser chrome doesn't clip content */
-              minHeight: "100dvh",
+              /* Enforce exact 100dvh height box so flex content scrolls inside */
+              height: "100dvh",
+              maxHeight: "100dvh",
               boxSizing: "border-box",
               display: "flex",
               flexDirection: "column",
               WebkitOverflowScrolling: "touch",
               overscrollBehaviorY: "contain",
+              touchAction: "pan-y",
             }}
           >
             {/* Ambient lime glow — decorative, fixed to overlay */}
