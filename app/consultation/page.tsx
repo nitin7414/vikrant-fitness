@@ -26,6 +26,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ConsultationBooking } from "@/lib/types";
 import { NumberWheel } from "@/components/NumberWheel";
 import { useAssessmentStore } from "@/lib/assessmentStore";
+import { PageTransition } from "@/components/PageTransition";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -418,6 +419,7 @@ function TransformationQuestionnaireContent() {
   const displayEmail = hasAssessment ? contactEmail : email;
 
   return (
+    <PageTransition>
     <div className="relative min-h-screen bg-[#09090b] text-zinc-100 pt-28 sm:pt-32 pb-20 overflow-hidden select-none">
       {/* Ambient Radial Backlight Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#bef264]/10 rounded-full blur-[150px] pointer-events-none -z-0" />
@@ -788,6 +790,7 @@ function TransformationQuestionnaireContent() {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 }
 

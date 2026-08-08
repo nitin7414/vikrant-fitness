@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ServiceProgram } from "@/lib/types";
 import { MOCK_SERVICES } from "@/lib/data";
+import { PageTransition } from "@/components/PageTransition";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -74,6 +75,7 @@ export default function ServicesPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="relative min-h-screen bg-[#09090b] pt-28 sm:pt-32 pb-20 text-zinc-100 overflow-hidden select-none">
       {/* Ambient Radial Backlight Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#bef264]/10 rounded-full blur-[150px] pointer-events-none -z-0" />
@@ -236,5 +238,6 @@ export default function ServicesPage() {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 }

@@ -391,14 +391,12 @@ export function WizardPortal({
               background:
                 "linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #ecfccb 100%)",
               color: "#09090b",
-              overflowY: "auto",
-              overflowX: "hidden",
+              overflow: "hidden",
               height: "100dvh",
               maxHeight: "100dvh",
               boxSizing: "border-box",
-              display: "block",
-              WebkitOverflowScrolling: "touch",
-              overscrollBehaviorY: "contain",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             {/* Ambient lime glow — decorative, fixed to overlay */}
@@ -461,19 +459,18 @@ export function WizardPortal({
                 zIndex: 1,
               }}
             >
-              {/* ══ HEADER (STEPS & PROGRESS) — sticky at top of overlay ══ */}
-              <div
-                style={{
-                  position: "sticky",
-                  top: 0,
-                  flexShrink: 0,
-                  background: "rgba(255, 255, 255, 0.92)",
-                  backdropFilter: "blur(12px)",
-                  borderBottom: "1px solid #e2e8f0",
-                  padding: "16px 24px 14px",
-                  zIndex: 10,
-                }}
-              >
+            {/* ══ HEADER (STEPS & PROGRESS) — fixed at top of overlay ══ */}
+            <div
+              style={{
+                flexShrink: 0,
+                background: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(12px)",
+                borderBottom: "1px solid #e2e8f0",
+                padding: "16px 24px 14px",
+                position: "relative",
+                zIndex: 10,
+              }}
+            >
                 {/* Row 1 — step dots + label (close button is fixed top-right) */}
                 <div
                   style={{
@@ -597,17 +594,26 @@ export function WizardPortal({
                 </div>
               </div>
 
-              {/* ══ STEP CONTENT — no inner scroll, outer container scrolls ══ */}
+              {/* ══ STEP CONTENT — inner scroll container ══ */}
               <div
+                ref={scrollContainerRef}
                 style={{
                   flex: 1,
-                  padding: "clamp(20px, 4vw, 40px) clamp(16px, 5vw, 48px) 64px",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  WebkitOverflowScrolling: "touch",
+                  overscrollBehaviorY: "contain",
+                  padding: "clamp(20px, 4vw, 40px) clamp(16px, 5vw, 48px) 80px",
                   boxSizing: "border-box",
-                  maxWidth: "860px",
-                  width: "100%",
-                  margin: "0 auto",
                 }}
               >
+                <div
+                  style={{
+                    maxWidth: "860px",
+                    width: "100%",
+                    margin: "0 auto",
+                  }}
+                >
                 {/* ══ CELEBRATION SUCCESS SCREEN ══ */}
                 <AnimatePresence mode="wait">
                   {bookingId ? (
@@ -1117,7 +1123,7 @@ export function WizardPortal({
                               fontWeight: 600,
                             }}
                           >
-                            Scroll or drag each wheel to lock in your baseline.
+                            Select or type your age and target parameters.
                           </p>
                         </div>
 
@@ -1806,6 +1812,7 @@ export function WizardPortal({
                   </motion.div>
                 </AnimatePresence>
                 )} {/* end !bookingId */}
+                </div>
               </div>
             </div>
           </motion.div>

@@ -29,6 +29,7 @@ import { WizardPortal } from "@/components/WizardPortal";
 import { ExploreContent } from "@/components/ExploreContent";
 import { Footer } from "@/components/Footer";
 import { useAssessmentStore } from "@/lib/assessmentStore";
+import { PageTransition } from "@/components/PageTransition";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
@@ -212,7 +213,7 @@ function HomeContent() {
   };
 
   return (
-    <>
+    <PageTransition>
       {/* WIZARD PORTAL — renders directly into document.body, OUTSIDE the GSAP transform tree */}
       <WizardPortal
         isOpen={wizardOpen}
@@ -419,7 +420,7 @@ function HomeContent() {
         </div>
       )}
     </div>
-    </>
+    </PageTransition>
   );
 }
 

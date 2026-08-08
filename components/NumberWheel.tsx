@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
 
 interface NumberInputProps {
@@ -25,22 +25,38 @@ export function NumberWheel({
   const isBlend = theme === "blend";
   const numValue = typeof value === "string" ? parseInt(value, 10) || min : value;
 
+  const [inputStr, setInputStr] = useState<string>(String(numValue));
+
+  useEffect(() => {
+    setInputStr(String(numValue));
+  }, [numValue]);
+
   const clamp = (v: number) => Math.min(max, Math.max(min, v));
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
-    if (raw === "") {
-      onChange(min);
-      return;
+    setInputStr(raw);
+    if (raw !== "") {
+      const parsed = parseInt(raw, 10);
+      if (!isNaN(parsed)) {
+        onChange(clamp(parsed));
+      }
     }
-    const val = parseInt(raw, 10);
-    if (!isNaN(val)) {
-      onChange(clamp(val));
+  };
+
+  const handleBlur = () => {
+    if (inputStr === "" || isNaN(parseInt(inputStr, 10))) {
+      setInputStr(String(numValue));
+    } else {
+      const clamped = clamp(parseInt(inputStr, 10));
+      setInputStr(String(clamped));
+      onChange(clamped);
     }
   };
 
   const step = (delta: number) => {
     const next = clamp(numValue + delta);
+    setInputStr(String(next));
     onChange(next);
   };
 
@@ -123,8 +139,9 @@ export function NumberWheel({
             type="number"
             min={min}
             max={max}
-            value={numValue}
+            value={inputStr}
             onChange={handleInputChange}
+            onBlur={handleBlur}
             style={{
               width: "100%",
               textAlign: "center",
