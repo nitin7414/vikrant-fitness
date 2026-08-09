@@ -275,27 +275,44 @@ export function WizardPortal({
 
   // Lock background body scroll & pause GSAP ScrollSmoother when overlay is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
+    const disableGSAPScroll = () => {
       try {
         const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
         if (smoother) smoother.paused(true);
       } catch {}
-      setShowForm(false);
-    } else {
-      document.body.style.overflow = "";
+      try {
+        const ScrollTrigger =
+          (window as any).gsap?.plugins?.ScrollTrigger ||
+          (window as any).ScrollTrigger;
+        if (ScrollTrigger?.normalizeScroll) ScrollTrigger.normalizeScroll(false);
+      } catch {}
+    };
+
+    const enableGSAPScroll = () => {
       try {
         const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
         if (smoother) smoother.paused(false);
       } catch {}
+      try {
+        const ScrollTrigger =
+          (window as any).gsap?.plugins?.ScrollTrigger ||
+          (window as any).ScrollTrigger;
+        if (ScrollTrigger?.normalizeScroll) ScrollTrigger.normalizeScroll(true);
+      } catch {}
+    };
+
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      disableGSAPScroll();
+      setShowForm(false);
+    } else {
+      document.body.style.overflow = "";
+      enableGSAPScroll();
       setShowForm(false);
     }
     return () => {
       document.body.style.overflow = "";
-      try {
-        const smoother = (window as any).gsap?.plugins?.ScrollSmoother?.get?.();
-        if (smoother) smoother.paused(false);
-      } catch {}
+      enableGSAPScroll();
     };
   }, [isOpen]);
 
@@ -380,6 +397,8 @@ export function WizardPortal({
             exit={{ y: "100%", transition: { duration: 0.35, ease: [0.76, 0, 0.24, 1] } }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             onWheel={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
             style={{
               position: "fixed",
               top: 0,
@@ -396,6 +415,7 @@ export function WizardPortal({
               boxSizing: "border-box",
               display: "flex",
               flexDirection: "column",
+              touchAction: "pan-y",
             }}
           >
             {/* Ambient lime glow — decorative, fixed to overlay */}
@@ -600,14 +620,18 @@ export function WizardPortal({
               {/* ══ STEP CONTENT — inner scroll container ══ */}
               <div
                 ref={scrollContainerRef}
+                onWheel={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
                 style={{
                   flex: "1 1 0%",
                   minHeight: 0,
                   overflowY: "auto",
                   overflowX: "hidden",
                   WebkitOverflowScrolling: "touch",
+                  touchAction: "pan-y",
                   overscrollBehaviorY: "contain",
-                  padding: "clamp(20px, 4vw, 36px) clamp(16px, 5vw, 48px) calc(110px + env(safe-area-inset-bottom, 0px))",
+                  padding: "clamp(20px, 4vw, 36px) clamp(16px, 5vw, 48px) calc(120px + env(safe-area-inset-bottom, 0px))",
                   boxSizing: "border-box",
                 }}
               >
@@ -1317,6 +1341,7 @@ export function WizardPortal({
                                   justifyContent: "space-between",
                                   gap: "16px",
                                   transition: "all 0.2s ease",
+                                  touchAction: "pan-y",
                                 }}
                               >
                                 {/* Left Side: Text Details */}
@@ -1395,14 +1420,15 @@ export function WizardPortal({
                                 {/* Right Side: Body Shape Image */}
                                 <div
                                   style={{
-                                    width: "120px",
-                                    height: "80px",
+                                    width: "100px",
+                                    height: "72px",
                                     borderRadius: "14px",
                                     overflow: "hidden",
                                     border: "1px solid #cbd5e1",
                                     background: "#09090b",
                                     flexShrink: 0,
                                     position: "relative",
+                                    pointerEvents: "none",
                                   }}
                                 >
                                   <img
