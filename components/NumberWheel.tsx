@@ -34,7 +34,7 @@ export function NumberWheel({
   const clamp = (v: number) => Math.min(max, Math.max(min, v));
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
+    const raw = e.target.value.replace(/\D/g, "");
     setInputStr(raw);
     if (raw !== "") {
       const parsed = parseInt(raw, 10);
@@ -66,11 +66,11 @@ export function NumberWheel({
         background: isBlend ? "#ffffff" : "#111113",
         border: isBlend ? "2px solid #cbd5e1" : "2px solid #27272a",
         borderRadius: "20px",
-        padding: "16px 20px",
+        padding: "14px 12px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "12px",
+        gap: "10px",
         width: "100%",
         boxSizing: "border-box",
         boxShadow: isBlend ? "0 4px 15px rgba(0,0,0,0.04)" : "none",
@@ -83,7 +83,7 @@ export function NumberWheel({
           fontSize: "11px",
           fontWeight: 800,
           textTransform: "uppercase",
-          letterSpacing: "0.12em",
+          letterSpacing: "0.1em",
           color: isBlend ? "#475569" : "#71717a",
         }}
       >
@@ -96,7 +96,7 @@ export function NumberWheel({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "8px",
+          gap: "6px",
           width: "100%",
         }}
       >
@@ -107,8 +107,8 @@ export function NumberWheel({
           disabled={numValue <= min}
           aria-label={`Decrease ${label}`}
           style={{
-            width: "38px",
-            height: "38px",
+            width: "36px",
+            height: "36px",
             borderRadius: "12px",
             background: isBlend ? "#f1f5f9" : "#18181b",
             border: isBlend ? "1.5px solid #cbd5e1" : "1.5px solid #27272a",
@@ -121,7 +121,7 @@ export function NumberWheel({
             transition: "all 0.15s ease",
           }}
         >
-          <Minus size={16} strokeWidth={2.5} />
+          <Minus size={15} strokeWidth={2.5} />
         </button>
 
         {/* Input box */}
@@ -132,15 +132,15 @@ export function NumberWheel({
             alignItems: "center",
             justifyContent: "center",
             flex: 1,
-            maxWidth: "110px",
-            minHeight: "46px",
+            minWidth: "48px",
+            minHeight: "44px",
             overflow: "visible",
           }}
         >
           <input
-            type="number"
-            min={min}
-            max={max}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={inputStr}
             onChange={handleInputChange}
             onBlur={handleBlur}
@@ -149,18 +149,18 @@ export function NumberWheel({
               height: "44px",
               lineHeight: "44px",
               textAlign: "center",
-              fontSize: "26px",
+              fontSize: "24px",
               fontWeight: 900,
               color: isBlend ? "#3f6212" : "#bef264",
               background: "transparent",
               border: "none",
               outline: "none",
               fontFamily: "inherit",
-              padding: 0,
+              padding: "0 2px",
               margin: 0,
               boxSizing: "border-box",
               WebkitAppearance: "none",
-              MozAppearance: "textfield",
+              MozAppearance: "none",
               appearance: "none",
             }}
           />
@@ -173,8 +173,8 @@ export function NumberWheel({
           disabled={numValue >= max}
           aria-label={`Increase ${label}`}
           style={{
-            width: "38px",
-            height: "38px",
+            width: "36px",
+            height: "36px",
             borderRadius: "12px",
             background: isBlend ? "#f1f5f9" : "#18181b",
             border: isBlend ? "1.5px solid #cbd5e1" : "1.5px solid #27272a",
@@ -187,7 +187,7 @@ export function NumberWheel({
             transition: "all 0.15s ease",
           }}
         >
-          <Plus size={16} strokeWidth={2.5} />
+          <Plus size={15} strokeWidth={2.5} />
         </button>
       </div>
 

@@ -999,7 +999,7 @@ export function WizardPortal({
                             whiteSpace: "nowrap",
                           }}
                         >
-                          Call Coach
+                          Call us
                         </span>
 
                         {/* Pulsing Phone Circle Icon */}
@@ -1292,8 +1292,8 @@ export function WizardPortal({
                           style={{
                             display: "grid",
                             gridTemplateColumns:
-                              "repeat(auto-fit, minmax(145px, 1fr))",
-                            gap: "14px",
+                              "repeat(auto-fit, minmax(130px, 1fr))",
+                            gap: "12px",
                           }}
                         >
                           <NumberWheel
