@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -17,6 +18,7 @@ import {
   PartyPopper,
   Phone,
   RefreshCw,
+  Compass,
 } from "lucide-react";
 
 import { NumberWheel } from "@/components/NumberWheel";
@@ -39,6 +41,7 @@ interface FormData {
 interface WizardPortalProps {
   isOpen: boolean;
   onClose: () => void;
+  onExplore?: () => void;
   currentStep: number;
   setCurrentStep: (step: number) => void;
   formData: FormData;
@@ -201,12 +204,14 @@ const QUOTES: Record<number, string> = {
 export function WizardPortal({
   isOpen,
   onClose,
+  onExplore,
   currentStep,
   setCurrentStep,
   formData,
   setFormData,
   getProgressPercentage,
 }: WizardPortalProps) {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -214,6 +219,15 @@ export function WizardPortal({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const setAssessment = useAssessmentStore((s) => s.setAssessment);
   const clearAssessment = useAssessmentStore((s) => s.clearAssessment);
+
+  const handleExploreClick = () => {
+    onClose();
+    if (onExplore) {
+      onExplore();
+    } else {
+      router.push("/explore");
+    }
+  };
 
   /** Submit wizard data to the universal /api/consultation endpoint */
   const handleSubmit = useCallback(async () => {
@@ -835,6 +849,41 @@ export function WizardPortal({
                         </div>
                       </motion.div>
 
+                      {/* Explore plans and reviews button below summary card */}
+                      <motion.button
+                        type="button"
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.58, duration: 0.45 }}
+                        whileHover={{ scale: 1.03, boxShadow: "0 8px 30px rgba(132, 204, 22, 0.45)" }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={handleExploreClick}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "10px",
+                          width: "100%",
+                          maxWidth: "460px",
+                          padding: "16px 24px",
+                          borderRadius: "999px",
+                          fontSize: "13px",
+                          fontWeight: 900,
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                          background: "linear-gradient(90deg, #bef264 0%, #84cc16 100%)",
+                          color: "#09090b",
+                          border: "none",
+                          cursor: "pointer",
+                          boxShadow: "0 4px 20px rgba(132, 204, 22, 0.35)",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        <Compass size={18} />
+                        <span>Explore the plans and reviews meanwhile</span>
+                        <ArrowRight size={16} />
+                      </motion.button>
+
                       {/* Action buttons */}
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -892,6 +941,89 @@ export function WizardPortal({
                           Close &amp; Return to Homepage
                         </button>
                       </motion.div>
+
+                      {/* Floating Animated Call Button Icon */}
+                      <motion.a
+                        href="tel:+18009876543"
+                        aria-label="Direct call coach"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ delay: 0.7, type: "spring", stiffness: 260, damping: 20 }}
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.94 }}
+                        style={{
+                          position: "fixed",
+                          bottom: "28px",
+                          right: "28px",
+                          zIndex: 100005,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          textDecoration: "none",
+                        }}
+                      >
+                        {/* Pulse aura effect */}
+                        <motion.span
+                          animate={{
+                            scale: [1, 1.5, 1],
+                            opacity: [0.6, 0, 0.6],
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            borderRadius: "999px",
+                            background: "#84cc16",
+                            zIndex: -1,
+                          }}
+                        />
+
+                        {/* Call button text pill */}
+                        <span
+                          style={{
+                            background: "#09090b",
+                            color: "#bef264",
+                            fontSize: "12px",
+                            fontWeight: 900,
+                            letterSpacing: "0.06em",
+                            textTransform: "uppercase",
+                            padding: "9px 16px",
+                            borderRadius: "999px",
+                            boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                            border: "1px solid #27272a",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          Call Coach Directly
+                        </span>
+
+                        {/* Pulsing Phone Circle Icon */}
+                        <div
+                          style={{
+                            width: "56px",
+                            height: "56px",
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg, #bef264 0%, #84cc16 100%)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 6px 24px rgba(132, 204, 22, 0.5), 0 0 0 4px rgba(9, 9, 11, 0.9)",
+                            color: "#09090b",
+                          }}
+                        >
+                          <motion.div
+                            animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
+                            transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2 }}
+                          >
+                            <Phone size={24} strokeWidth={2.5} />
+                          </motion.div>
+                        </div>
+                      </motion.a>
                     </motion.div>
                   ) : null}
                 </AnimatePresence>

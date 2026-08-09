@@ -133,6 +133,8 @@ export function NumberWheel({
             justifyContent: "center",
             flex: 1,
             maxWidth: "110px",
+            minHeight: "46px",
+            overflow: "visible",
           }}
         >
           <input
@@ -144,6 +146,8 @@ export function NumberWheel({
             onBlur={handleBlur}
             style={{
               width: "100%",
+              height: "44px",
+              lineHeight: "44px",
               textAlign: "center",
               fontSize: "26px",
               fontWeight: 900,
@@ -152,8 +156,12 @@ export function NumberWheel({
               border: "none",
               outline: "none",
               fontFamily: "inherit",
-              padding: "4px 0",
+              padding: 0,
+              margin: 0,
+              boxSizing: "border-box",
+              WebkitAppearance: "none",
               MozAppearance: "textfield",
+              appearance: "none",
             }}
           />
         </div>

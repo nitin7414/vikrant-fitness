@@ -218,6 +218,7 @@ function HomeContent() {
       <WizardPortal
         isOpen={wizardOpen}
         onClose={() => setWizardOpen(false)}
+        onExplore={handleExploreClick}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         formData={formData}
