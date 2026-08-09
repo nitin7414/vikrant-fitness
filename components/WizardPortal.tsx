@@ -855,33 +855,33 @@ export function WizardPortal({
                         initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.58, duration: 0.45 }}
-                        whileHover={{ scale: 1.03, boxShadow: "0 8px 30px rgba(132, 204, 22, 0.45)" }}
+                        whileHover={{ scale: 1.02, boxShadow: "0 6px 20px rgba(132, 204, 22, 0.4)" }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleExploreClick}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          gap: "10px",
+                          gap: "8px",
                           width: "100%",
-                          maxWidth: "460px",
-                          padding: "16px 24px",
+                          maxWidth: "400px",
+                          padding: "12px 20px",
                           borderRadius: "999px",
-                          fontSize: "13px",
-                          fontWeight: 900,
+                          fontSize: "12px",
+                          fontWeight: 800,
                           letterSpacing: "0.04em",
                           textTransform: "uppercase",
                           background: "linear-gradient(90deg, #bef264 0%, #84cc16 100%)",
                           color: "#09090b",
                           border: "none",
                           cursor: "pointer",
-                          boxShadow: "0 4px 20px rgba(132, 204, 22, 0.35)",
+                          boxShadow: "0 4px 16px rgba(132, 204, 22, 0.3)",
                           transition: "all 0.2s ease",
                         }}
                       >
-                        <Compass size={18} />
-                        <span>Explore the plans and reviews meanwhile</span>
-                        <ArrowRight size={16} />
+                        <Compass size={16} />
+                        <span>Explore plans &amp; reviews meanwhile</span>
+                        <ArrowRight size={14} />
                       </motion.button>
 
                       {/* Action buttons */}
@@ -892,7 +892,7 @@ export function WizardPortal({
                         style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%", maxWidth: "400px" }}
                       >
                         {/* Book another */}
-                        <div style={{ padding: "16px", background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                        <div style={{ padding: "14px 16px", background: "#f8fafc", border: "1.5px solid #e2e8f0", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
                           <div style={{ textAlign: "left" }}>
                             <p style={{ fontSize: "12px", fontWeight: 800, color: "#09090b", margin: 0 }}>Need another consultation?</p>
                             <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0", fontWeight: 500 }}>Book for a friend or a different goal</p>
@@ -908,7 +908,7 @@ export function WizardPortal({
                               alignItems: "center",
                               gap: "6px",
                               borderRadius: "999px",
-                              padding: "9px 18px",
+                              padding: "8px 16px",
                               fontSize: "11px",
                               fontWeight: 900,
                               letterSpacing: "0.05em",
@@ -942,7 +942,7 @@ export function WizardPortal({
                         </button>
                       </motion.div>
 
-                      {/* Floating Animated Call Button Icon */}
+                      {/* Floating Animated Call Button Icon — Compact & Positioned Slightly Above */}
                       <motion.a
                         href="tel:+18009876543"
                         aria-label="Direct call coach"
@@ -950,24 +950,24 @@ export function WizardPortal({
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
                         transition={{ delay: 0.7, type: "spring", stiffness: 260, damping: 20 }}
-                        whileHover={{ scale: 1.08 }}
+                        whileHover={{ scale: 1.06 }}
                         whileTap={{ scale: 0.94 }}
                         style={{
                           position: "fixed",
-                          bottom: "28px",
-                          right: "28px",
+                          bottom: "75px",
+                          right: "20px",
                           zIndex: 100005,
                           display: "flex",
                           alignItems: "center",
-                          gap: "10px",
+                          gap: "8px",
                           textDecoration: "none",
                         }}
                       >
                         {/* Pulse aura effect */}
                         <motion.span
                           animate={{
-                            scale: [1, 1.5, 1],
-                            opacity: [0.6, 0, 0.6],
+                            scale: [1, 1.4, 1],
+                            opacity: [0.5, 0, 0.5],
                           }}
                           transition={{
                             duration: 2,
@@ -988,31 +988,31 @@ export function WizardPortal({
                           style={{
                             background: "#09090b",
                             color: "#bef264",
-                            fontSize: "12px",
-                            fontWeight: 900,
-                            letterSpacing: "0.06em",
+                            fontSize: "11px",
+                            fontWeight: 800,
+                            letterSpacing: "0.05em",
                             textTransform: "uppercase",
-                            padding: "9px 16px",
+                            padding: "6px 12px",
                             borderRadius: "999px",
-                            boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                            boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
                             border: "1px solid #27272a",
                             whiteSpace: "nowrap",
                           }}
                         >
-                          Call Coach Directly
+                          Call Coach
                         </span>
 
                         {/* Pulsing Phone Circle Icon */}
                         <div
                           style={{
-                            width: "56px",
-                            height: "56px",
+                            width: "44px",
+                            height: "44px",
                             borderRadius: "50%",
                             background: "linear-gradient(135deg, #bef264 0%, #84cc16 100%)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxShadow: "0 6px 24px rgba(132, 204, 22, 0.5), 0 0 0 4px rgba(9, 9, 11, 0.9)",
+                            boxShadow: "0 4px 16px rgba(132, 204, 22, 0.5), 0 0 0 3px rgba(9, 9, 11, 0.9)",
                             color: "#09090b",
                           }}
                         >
@@ -1020,7 +1020,7 @@ export function WizardPortal({
                             animate={{ rotate: [0, -15, 15, -10, 10, 0] }}
                             transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2 }}
                           >
-                            <Phone size={24} strokeWidth={2.5} />
+                            <Phone size={18} strokeWidth={2.2} />
                           </motion.div>
                         </div>
                       </motion.a>
