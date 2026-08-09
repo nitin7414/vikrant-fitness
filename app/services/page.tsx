@@ -91,7 +91,7 @@ export default function ServicesPage() {
             SELECT YOUR <span className="text-[#bef264]">TRANSFORMATION</span> PATH
           </h1>
           <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-            Every program is structured around proven training principles, customized nutrition plans, and direct accountability with Coach Vikrant.
+            Every program is structured around proven training principles, customized nutrition plans, and direct accountability with Us.
           </p>
         </div>
 

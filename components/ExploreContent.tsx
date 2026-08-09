@@ -538,7 +538,7 @@ export function ExploreContent({ onOpenWizard }: ExploreContentProps) {
               Ready to Build Your <span className="text-[#bef264]">Best Physique?</span>
             </h2>
             <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-              Submit your details below to request a 1-on-1 strategy call directly with Coach Vikrant.
+              Submit your details below to request a 1-on-1 strategy call directly with Us.
             </p>
           </div>
 
@@ -550,7 +550,7 @@ export function ExploreContent({ onOpenWizard }: ExploreContentProps) {
               <div className="space-y-2">
                 <h3 className="text-2xl font-black text-white uppercase">Application Received!</h3>
                 <p className="text-xs text-zinc-300">
-                  Thank you, <span className="font-bold text-[#bef264]">{leadName}</span>. Coach Vikrant will contact you via Email & WhatsApp within 24 hours.
+                  Thank you, <span className="font-bold text-[#bef264]">{leadName}</span>. We will contact you via Email & WhatsApp within 24 hours.
                 </p>
               </div>
               <button

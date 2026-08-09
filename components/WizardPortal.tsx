@@ -312,7 +312,7 @@ export function WizardPortal({
   const NavBtn = ({
     onClick,
     disabled = false,
-    label = "Next",
+    label,
     icon = <ArrowRight size={15} />,
     dir = "forward",
   }: {
@@ -323,6 +323,7 @@ export function WizardPortal({
     dir?: "forward" | "back";
   }) => {
     const isBack = dir === "back";
+    const displayLabel = label ?? (isBack ? "Go Back" : "Next");
     return (
       <motion.button
         type="button"
@@ -358,7 +359,7 @@ export function WizardPortal({
         }}
       >
         {isBack && <ArrowLeft size={15} />}
-        <span>{label}</span>
+        <span>{displayLabel}</span>
         {!isBack && icon}
       </motion.button>
     );
@@ -374,13 +375,11 @@ export function WizardPortal({
         {showForm && (
           <motion.div
             key="wizard-overlay-container"
-            ref={scrollContainerRef}
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
             exit={{ y: "100%", transition: { duration: 0.35, ease: [0.76, 0, 0.24, 1] } }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             onWheel={(e) => e.stopPropagation()}
-            onTouchMove={(e) => e.stopPropagation()}
             style={{
               position: "fixed",
               top: 0,
@@ -452,11 +451,15 @@ export function WizardPortal({
             {/* ══ INNER CONTENT CARD — full width, no max-width on outer shell ══ */}
             <div
               style={{
-                minHeight: "100%",
+                height: "100%",
+                maxHeight: "100%",
+                flex: "1 1 0%",
+                minHeight: 0,
                 display: "flex",
                 flexDirection: "column",
                 position: "relative",
                 zIndex: 1,
+                overflow: "hidden",
               }}
             >
             {/* ══ HEADER (STEPS & PROGRESS) — fixed at top of overlay ══ */}
@@ -598,12 +601,13 @@ export function WizardPortal({
               <div
                 ref={scrollContainerRef}
                 style={{
-                  flex: 1,
+                  flex: "1 1 0%",
+                  minHeight: 0,
                   overflowY: "auto",
                   overflowX: "hidden",
                   WebkitOverflowScrolling: "touch",
                   overscrollBehaviorY: "contain",
-                  padding: "clamp(20px, 4vw, 40px) clamp(16px, 5vw, 48px) 80px",
+                  padding: "clamp(20px, 4vw, 36px) clamp(16px, 5vw, 48px) calc(110px + env(safe-area-inset-bottom, 0px))",
                   boxSizing: "border-box",
                 }}
               >
@@ -746,7 +750,7 @@ export function WizardPortal({
                           transition={{ delay: 0.45, duration: 0.4 }}
                           style={{ fontSize: "13px", color: "#475569", fontWeight: 600, margin: 0 }}
                         >
-                          Coach Vikrant will personally reach out within 24 hours to kick off your transformation.
+                          We will personally reach out within 24 hours to kick off your transformation.
                         </motion.p>
                       </div>
 
@@ -802,7 +806,7 @@ export function WizardPortal({
 
                         {/* Next step note */}
                         <div style={{ marginTop: "14px", padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", fontSize: "11px", color: "#166534", lineHeight: 1.5 }}>
-                          <strong>⚡ What&apos;s next:</strong> Coach Vikrant will review your profile and reach out via WhatsApp
+                          <strong>⚡ What&apos;s next:</strong> We will review your profile and reach out via WhatsApp
                           {formData.phone ? ` (${formData.phone})` : ""} &amp; email within 24 hours to schedule your 1-on-1 strategy call.
                         </div>
                       </motion.div>
@@ -1132,8 +1136,8 @@ export function WizardPortal({
                           style={{
                             display: "grid",
                             gridTemplateColumns:
-                              "repeat(auto-fit, minmax(180px, 1fr))",
-                            gap: "16px",
+                              "repeat(auto-fit, minmax(145px, 1fr))",
+                            gap: "14px",
                           }}
                         >
                           <NumberWheel
@@ -1496,7 +1500,7 @@ export function WizardPortal({
                           />
                           <NavBtn
                             onClick={() => setCurrentStep(4)}
-                            label="Generate Protocol"
+                            label="Lock in!"
                             icon={<Sparkles size={15} />}
                           />
                         </div>

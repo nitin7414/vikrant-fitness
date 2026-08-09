@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Vikrant Fitness | Elite Personal Coaching & 1-on-1 Transformation",
   description:
-    "Science-backed personal coaching, tailored fat loss protocols, hypertrophy training, and 1-on-1 consultations with Coach Vikrant.",
+    "Science-backed personal coaching, tailored fat loss protocols, hypertrophy training, and 1-on-1 consultations with Trainer Vikrant.",
   keywords: [
     "Vikrant Fitness",
     "Personal Trainer",

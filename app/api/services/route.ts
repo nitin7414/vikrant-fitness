@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Thank you! Your program inquiry has been received. Coach Vikrant will contact you within 24 hours.",
+        message: "Thank you! Your program inquiry has been received. We will contact you within 24 hours.",
         data: inquiry,
       },
       { status: 201 }

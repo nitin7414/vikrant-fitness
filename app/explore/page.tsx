@@ -34,6 +34,11 @@ export default function ExplorePage() {
     }
   };
 
+  const handleOpenWizard = () => {
+    setWizardOpen(true);
+    setCurrentStep(1);
+  };
+
   return (
     <>
       <WizardPortal
@@ -45,10 +50,7 @@ export default function ExplorePage() {
         setFormData={setFormData}
         getProgressPercentage={getProgressPercentage}
       />
-      <ExploreContent onOpenWizard={() => {
-        setWizardOpen(true);
-        setCurrentStep(1);
-      }} />
+      <ExploreContent onOpenWizard={handleOpenWizard} />
       <Footer forceRender />
     </>
   );

@@ -192,7 +192,7 @@ export default function AboutPage() {
         {/* CTA BANNER */}
         <div className="text-center py-16 rounded-3xl border border-[#bef264]/40 bg-zinc-900/80 space-y-6 gsap-reveal shadow-[0_0_50px_rgba(190,242,100,0.1)]">
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
-            Ready to Work 1-on-1 With <span className="text-[#bef264]">Coach Vikrant?</span>
+            Ready to Work 1-on-1 With <span className="text-[#bef264]">Us?</span>
           </h2>
           <p className="text-zinc-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
             Book a dedicated consultation session today to discuss your goals, schedule, and custom transformation strategy.

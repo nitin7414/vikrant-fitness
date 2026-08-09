@@ -87,7 +87,7 @@ function RecapCard({
             <span className="text-[#bef264]">{name}</span>
           </h2>
           <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-            Coach Vikrant has your profile ready. All that&apos;s left is a way to reach you.
+            We have your profile ready. All that&apos;s left is a way to reach you.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ function RecapCard({
       {/* Coach note */}
       <div className="mt-4 p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-800 text-xs text-zinc-400 leading-relaxed">
         <span className="font-bold text-[#bef264]">⚡ On your call: </span>
-        Coach Vikrant will use these numbers to map your personalised training + nutrition protocol
+        We will use these numbers to map your personalised training + nutrition protocol
         — no starting from scratch.
       </div>
     </div>
@@ -441,7 +441,7 @@ function TransformationQuestionnaireContent() {
           <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
             {hasAssessment
               ? "Your assessment data is saved. Just confirm how to reach you and we'll handle the rest."
-              : "Fill out your physical metrics & transformation objectives to unlock your customised coaching blueprint directly with Coach Vikrant."}
+              : "Fill out your physical metrics & transformation objectives to unlock your customised coaching blueprint directly with Us."}
           </p>
         </div>
 
@@ -570,7 +570,7 @@ function TransformationQuestionnaireContent() {
                       Who is <span className="text-[#bef264]">Transforming?</span>
                     </h2>
                     <p className="text-xs text-zinc-400">
-                      Enter your official contact details so Coach Vikrant can reach you.
+                      Enter your official contact detainl so we can reach you.
                     </p>
                   </div>
 
@@ -651,7 +651,7 @@ function TransformationQuestionnaireContent() {
 
                   <div className="pt-4 flex justify-between items-center border-t border-zinc-800">
                     <button type="button" onClick={() => setStep(1)} className="flex items-center gap-2 rounded-full bg-zinc-950 border border-zinc-800 px-6 py-3 text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer">
-                      <ArrowLeft className="h-4 w-4" /> Back
+                      <ArrowLeft className="h-4 w-4" /> Go Back
                     </button>
                     <button type="button" onClick={() => setStep(3)} className="flex items-center gap-2 rounded-full bg-[#bef264] px-8 py-3.5 text-xs font-black uppercase tracking-wider text-zinc-950 hover:bg-[#a3e635] transition shadow-[0_0_25px_rgba(190,242,100,0.35)] active:scale-95 cursor-pointer">
                       <span>Next: Choose Objective</span>
@@ -724,10 +724,10 @@ function TransformationQuestionnaireContent() {
 
                   <div className="pt-4 flex justify-between items-center border-t border-zinc-800">
                     <button type="button" onClick={() => setStep(2)} className="flex items-center gap-2 rounded-full bg-zinc-950 border border-zinc-800 px-6 py-3 text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer">
-                      <ArrowLeft className="h-4 w-4" /> Back
+                      <ArrowLeft className="h-4 w-4" /> Go Back
                     </button>
                     <button type="button" onClick={() => setStep(4)} className="flex items-center gap-2 rounded-full bg-[#bef264] px-8 py-3.5 text-xs font-black uppercase tracking-wider text-zinc-950 hover:bg-[#a3e635] transition shadow-[0_0_25px_rgba(190,242,100,0.35)] active:scale-95 cursor-pointer">
-                      <span>Generate Protocol</span>
+                      <span>Lock it!</span>
                       <Sparkles className="h-4 w-4" />
                     </button>
                   </div>
@@ -739,7 +739,7 @@ function TransformationQuestionnaireContent() {
                 <div className="space-y-6 text-center">
                   <div className="inline-flex items-center gap-1.5 rounded-full border border-[#bef264]/40 bg-[#bef264]/10 px-4 py-1.5 text-xs font-black text-[#bef264]">
                     <Sparkles className="h-4 w-4" />
-                    <span>YOUR PLAN IS READY — COACH VIKRANT IS WAITING</span>
+                    <span>YOUR PLAN IS READY — We can't wait to get you Dive in...</span>
                   </div>
 
                   <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
